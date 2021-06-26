@@ -10,6 +10,9 @@ import java.util.List;
 import java.util.Queue;
 import java.util.Set;
 
+/**
+ * Class of one thread of scan
+ */
 public class ThreadFileScan implements Runnable {
 
     final private Path path;
@@ -17,6 +20,13 @@ public class ThreadFileScan implements Runnable {
     final private List<String> results;
     final private Queue<Runnable> queue;
 
+    /**
+     * Construct thread of scan
+     * @param path Path of directory to scan
+     * @param ignorePaths Set of ignored directories
+     * @param queue Queue of scan threads to add to it new threads of scan of subdirectories
+     * @param results List of results to save result on it
+     */
     public ThreadFileScan(Path path, Set<Path> ignorePaths, Queue<Runnable> queue, List<String> results) {
         this.path = path;
         this.ignorePaths = ignorePaths;
@@ -29,10 +39,14 @@ public class ThreadFileScan implements Runnable {
         connect(path);
     }
 
-    public void connect(Path curRootPath) {
+    /**
+     *
+     * @param curRootPath
+     */
+    private void connect(Path curRootPath) {
         //создаем фильтр, если через лямбды короче без ухудшения читаемости, то почему нет
         DirectoryStream.Filter<Path> filter = (Path currentPath) -> !ignorePaths.contains(currentPath);
-        //автозакрываемый поток всего что есть в дериктории с фильтрацией - идеально соответствует задаче
+        //автозакрываемый поток всего что есть в директории с фильтрацией - идеально соответствует задаче
         try (DirectoryStream<Path> stream = Files.newDirectoryStream(curRootPath, filter)) {
             for (Path curPath : stream) {
                 //если это директория - ставим в очередь на сканирование ее содержимого
@@ -52,6 +66,11 @@ public class ThreadFileScan implements Runnable {
         }
     }
 
+    /**
+     * Format file name, date of last modify and size to String
+     * @param path of file
+     * @return formatted String
+     */
     private String fileInfo(Path path) {
         File file = path.toFile();
         StringBuilder result = new StringBuilder();

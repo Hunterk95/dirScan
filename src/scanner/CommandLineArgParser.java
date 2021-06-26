@@ -19,22 +19,40 @@ public class CommandLineArgParser {
     private int numOfThreads = 4;
 
     //никакой логики в конструкторе, просто копируем входные аргументы
+
+    /**
+     * Construct command line args parser
+     * @param argv command line arguments
+     */
     public CommandLineArgParser(String[] argv) {
         this.argv = argv;
     }
 
+    /**
+     * @return number of thread to multithreading run
+     */
     public int getNumOfThreads() {
         return numOfThreads;
     }
 
+    /**
+     * @return List of Paths to scan
+     */
     public List<Path> getPaths() {
         return paths;
     }
 
+    /**
+     * @return Set of Paths to ignore
+     */
     public Set<Path> getIgnorePaths() {
         return ignorePaths;
     }
 
+    /**
+     * parse command line args to internal Collections
+     * @throws IllegalArgumentException if illegal key using
+     */
     public void parse() throws IllegalArgumentException {
         //это не просто ключ после которого одно значение,
         // а полностью меняющий смысл всего идущего за ним, так что так

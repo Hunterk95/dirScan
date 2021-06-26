@@ -5,25 +5,36 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
+import java.nio.file.attribute.FileAttribute;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.concurrent.*;
 import java.util.List;
 
 /**
- *
+ * Class to scan List of directories
  */
 public class FileScanner {
     final private List<Path> paths;
     final private Set<Path> ignorePaths;
     private List<String> results;
 
+    /**
+     * Construct Scanner
+     * @param paths List of Paths to scan
+     * @param ignorePaths Set of Paths to ignore
+     */
     public FileScanner(List<Path> paths, Set<Path> ignorePaths) {
         this.paths = paths;
         this.ignorePaths = ignorePaths;
     }
 
-    public void scan(int numOfThreads) {
+    /**
+     * Method to start directories scan in numOfThreads Threads
+     * @param numOfThreads
+     * @return String with all results of scan
+     */
+    public String scan(int numOfThreads) {
         results = new ArrayList<>();//создаем при начале сканирования,
         //если нам нужно отсканировать несколько раз, старые результаты нам не нужны
         BlockingQueue<Runnable> queue = createQueue();
@@ -45,8 +56,13 @@ public class FileScanner {
         }
         //сортируем для получения одного и того же порядка от сканирования к сканированию как указано в задаче
         Collections.sort(results);
+        return toString();
     }
 
+    /**
+     * Create LinkedBlockingQueue of ThreadFileScan for each Path in paths
+     * @return created LinkedBlockingQueue
+     */
     private BlockingQueue<Runnable> createQueue() {
         BlockingQueue<Runnable> queue = new LinkedBlockingQueue<>();
         try {
@@ -60,21 +76,27 @@ public class FileScanner {
         return queue;
     }
 
+    /**
+     * Method that create file "dirScan FULL-DATE-TIME.txt" and save results of scan to it
+     * Each file is located at path "./scan results/directories HASH-OF-ARGS-TO-SCAN scan results"
+     * @return Path of created file
+     */
     public Path saveToFile() {
+        if(toString().isEmpty()){
+            return null;
+        }
         try {
             Path rootDir = new File("./scan results/").toPath();
-            if (!Files.exists(rootDir)) {
-                Files.createDirectory(rootDir);
-            }
             //создаем разные директории для разных входных данных так как по условию предполагается
             // сравнение результатов сканирования с одними и теми же входными данными
             String parentDir = "./scan results/directories "
                     + Math.abs(paths.hashCode() ^ ignorePaths.hashCode())
                     + " scan results/";
             Path dir = new File(parentDir).toPath();
-            if (!Files.exists(dir)) {
+            try {
+                Files.createDirectory(rootDir);
                 Files.createDirectory(dir);
-            }
+            } catch (Exception e){}//значит директория уже существует
             //создаем новый файл для каждого сканирования
             SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd-HH.mm.ss");
             String newFileName = "dirScan " + dateFormat.format(System.currentTimeMillis()) + ".txt";
