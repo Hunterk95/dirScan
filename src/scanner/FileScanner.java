@@ -95,8 +95,12 @@ public class FileScanner {
             Path dir = new File(parentDir).toPath();
             try {
                 Files.createDirectory(rootDir);
+            } catch (Exception e){
+            }//значит директория уже существует
+            try {
                 Files.createDirectory(dir);
-            } catch (Exception e){}//значит директория уже существует
+            } catch (Exception e){
+            }
             //создаем новый файл для каждого сканирования
             SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd-HH.mm.ss");
             String newFileName = "dirScan " + dateFormat.format(System.currentTimeMillis()) + ".txt";
