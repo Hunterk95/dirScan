@@ -7,16 +7,14 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.text.SimpleDateFormat;
 import java.util.*;
-import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.LinkedBlockingQueue;
-import java.util.concurrent.ThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.*;
 
 class FileScannerTest {
     private List<Path> paths;
     private Set<Path> ignorePaths;
-    private List<String> results;
+    private Set<String> results;
 
     @Test //порядок от сканирования к сканированию должен оставаться постоянным,
     //также проверяем что от сканирования к сканированию не теряем файлы
@@ -31,7 +29,7 @@ class FileScannerTest {
         FileScanner scanner = new FileScanner(paths, ignorePaths);
         scanner.scan(4);
         String scan1 = scanner.toString();
-        scanner.scan(4);
+        scanner.scan(2);
         String scan2 = scanner.toString();
         Assertions.assertEquals(scan1, scan2);
     }
@@ -54,7 +52,7 @@ class FileScannerTest {
 
     @Test
     public void scan() throws IOException, InterruptedException {
-        results = new ArrayList<>();
+        results = new ConcurrentSkipListSet<>();
         paths = new ArrayList<>();
         paths.add(new File("./test/testdir/").toPath());
         ignorePaths = new HashSet<>();
@@ -71,8 +69,8 @@ class FileScannerTest {
         Files.createFile(Path.of("./test/testdir/3/3"));
         ThreadPoolExecutor executor =
                 new ThreadPoolExecutor(1, 1, 100, TimeUnit.MILLISECONDS, queue);
-        executor.prestartAllCoreThreads();
         Files.delete(Path.of("./test/testdir/1/1"));//delete file before scan it
+        executor.prestartAllCoreThreads();
         while(results.isEmpty()){
             Thread.sleep(10);
         }
@@ -97,16 +95,17 @@ class FileScannerTest {
             Files.delete(Path.of("./test/testdir/3"));
             Files.delete(Path.of("./test/testdir"));
         }
-        Collections.sort(results);
+
         String actual = toString();
         //check that if file has been deleted (lost connect to network directory) and restore after scan him path
         // that it not been scanned one more time
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
         Assertions.assertEquals("[\n" +
                 "file = /home/hunt/IdeaProjects/dirScan/./test/testdir/2/2\n" +
-                "date = 2021-06-26\n" +
+                "date = " + dateFormat.format(System.currentTimeMillis()) + "\n" +
                 "size = 0][\n" +
                 "file = /home/hunt/IdeaProjects/dirScan/./test/testdir/3/3\n" +
-                "date = 2021-06-26\n" +
+                "date = " + dateFormat.format(System.currentTimeMillis()) + "\n" +
                 "size = 0]", actual);
     }
 

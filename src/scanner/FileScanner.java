@@ -17,7 +17,7 @@ import java.util.List;
 public class FileScanner {
     final private List<Path> paths;
     final private Set<Path> ignorePaths;
-    private List<String> results;
+    private Set<String> results;
 
     /**
      * Construct Scanner
@@ -35,7 +35,7 @@ public class FileScanner {
      * @return String with all results of scan
      */
     public String scan(int numOfThreads) {
-        results = new ArrayList<>();//создаем при начале сканирования,
+        results = new ConcurrentSkipListSet<>();//создаем при начале сканирования,
         //если нам нужно отсканировать несколько раз, старые результаты нам не нужны
         BlockingQueue<Runnable> queue = createQueue();
 
@@ -55,8 +55,7 @@ public class FileScanner {
             e.printStackTrace();
         }
         //сортируем для получения одного и того же порядка от сканирования к сканированию как указано в задаче
-        Collections.sort(results);
-        return toString();
+            return toString();
     }
 
     /**
@@ -82,7 +81,8 @@ public class FileScanner {
      * @return Path of created file
      */
     public Path saveToFile() {
-        if(toString().isEmpty()){
+        String result = toString();
+        if(result.isEmpty()){
             return null;
         }
         try {
@@ -105,10 +105,9 @@ public class FileScanner {
             SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd-HH.mm.ss");
             String newFileName = "dirScan " + dateFormat.format(System.currentTimeMillis()) + ".txt";
             File newFile = new File(parentDir, newFileName);
-            Files.write(newFile.toPath(), List.of(toString()), StandardOpenOption.CREATE);
+            Files.write(newFile.toPath(), List.of(result), StandardOpenOption.CREATE);
 
             return newFile.toPath();
-
         } catch (IOException e) {
             System.out.println(e.getMessage());
             e.printStackTrace();

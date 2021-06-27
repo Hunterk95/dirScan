@@ -17,7 +17,7 @@ public class ThreadFileScan implements Runnable {
 
     final private Path path;
     final private Set<Path> ignorePaths;
-    final private List<String> results;
+    final private Set<String> results;
     final private Queue<Runnable> queue;
 
     /**
@@ -27,7 +27,7 @@ public class ThreadFileScan implements Runnable {
      * @param queue Queue of scan threads to add to it new threads of scan of subdirectories
      * @param results List of results to save result on it
      */
-    public ThreadFileScan(Path path, Set<Path> ignorePaths, Queue<Runnable> queue, List<String> results) {
+    public ThreadFileScan(Path path, Set<Path> ignorePaths, Queue<Runnable> queue, Set<String> results) {
         this.path = path;
         this.ignorePaths = ignorePaths;
         this.queue = queue;
@@ -36,14 +36,14 @@ public class ThreadFileScan implements Runnable {
 
     @Override
     public void run() {
-        connect(path);
+        oneDirScan(path);
     }
 
     /**
      *
      * @param curRootPath
      */
-    private void connect(Path curRootPath) {
+    private void oneDirScan(Path curRootPath) {
         //создаем фильтр, если через лямбды короче без ухудшения читаемости, то почему нет
         DirectoryStream.Filter<Path> filter = (Path currentPath) -> !ignorePaths.contains(currentPath);
         //автозакрываемый поток всего что есть в директории с фильтрацией - идеально соответствует задаче
@@ -51,12 +51,14 @@ public class ThreadFileScan implements Runnable {
             for (Path curPath : stream) {
                 //если это директория - ставим в очередь на сканирование ее содержимого
                 if (Files.isDirectory(curPath)) {
-                    queue.add(new ThreadFileScan(curPath, ignorePaths, queue, results));
+                    if(!queue.add(new ThreadFileScan(curPath, ignorePaths, queue, results))){
+                    throw new IllegalStateException("Cant add path to scan queue");
+                    }
                 }
                 //если это не директория - закидываем в лист результатов
                 // урезаем информацию до необходимой нам
                 // так сильно меньше памяти необходимо при большом количестве объектов
-                else synchronized (results){
+                else {
                     results.add(fileInfo(curPath));
                 }
                 //System.out.println(curPath);
