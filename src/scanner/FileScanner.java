@@ -2,6 +2,7 @@ package scanner;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.FileAlreadyExistsException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
@@ -21,7 +22,8 @@ public class FileScanner {
 
     /**
      * Construct Scanner
-     * @param paths List of Paths to scan
+     *
+     * @param paths       List of Paths to scan
      * @param ignorePaths Set of Paths to ignore
      */
     public FileScanner(List<Path> paths, Set<Path> ignorePaths) {
@@ -31,6 +33,7 @@ public class FileScanner {
 
     /**
      * Method to start directories scan in numOfThreads Threads
+     *
      * @param numOfThreads
      * @return String with all results of scan
      */
@@ -54,12 +57,12 @@ public class FileScanner {
             System.out.println("WTF");
             e.printStackTrace();
         }
-        //сортируем для получения одного и того же порядка от сканирования к сканированию как указано в задаче
-            return toString();
+        return toString();
     }
 
     /**
      * Create LinkedBlockingQueue of ThreadFileScan for each Path in paths
+     *
      * @return created LinkedBlockingQueue
      */
     private BlockingQueue<Runnable> createQueue() {
@@ -78,11 +81,12 @@ public class FileScanner {
     /**
      * Method that create file "dirScan FULL-DATE-TIME.txt" and save results of scan to it
      * Each file is located at path "./scan results/directories HASH-OF-ARGS-TO-SCAN scan results"
+     *
      * @return Path of created file
      */
     public Path saveToFile() {
         String result = toString();
-        if(result.isEmpty()){
+        if (result.isEmpty()) {
             return null;
         }
         try {
@@ -95,11 +99,15 @@ public class FileScanner {
             Path dir = new File(parentDir).toPath();
             try {
                 Files.createDirectory(rootDir);
-            } catch (Exception e){
-            }//значит директория уже существует
+            } catch (FileAlreadyExistsException ignored) {//значит директория уже существует
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
             try {
                 Files.createDirectory(dir);
-            } catch (Exception e){
+            } catch (FileAlreadyExistsException ignored) {
+            } catch (Exception e) {
+                e.printStackTrace();
             }
             //создаем новый файл для каждого сканирования
             SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd-HH.mm.ss");

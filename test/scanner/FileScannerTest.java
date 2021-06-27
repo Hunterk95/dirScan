@@ -27,9 +27,9 @@ class FileScannerTest {
         ignorePaths.add(new File("/usr/bin").toPath());
         ignorePaths.add(new File("/usr/include").toPath());
         FileScanner scanner = new FileScanner(paths, ignorePaths);
-        scanner.scan(4);
+        scanner.scan(1);
         String scan1 = scanner.toString();
-        scanner.scan(2);
+        scanner.scan(4);
         String scan2 = scanner.toString();
         Assertions.assertEquals(scan1, scan2);
     }

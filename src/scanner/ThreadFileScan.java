@@ -22,10 +22,11 @@ public class ThreadFileScan implements Runnable {
 
     /**
      * Construct thread of scan
-     * @param path Path of directory to scan
+     *
+     * @param path        Path of directory to scan
      * @param ignorePaths Set of ignored directories
-     * @param queue Queue of scan threads to add to it new threads of scan of subdirectories
-     * @param results List of results to save result on it
+     * @param queue       Queue of scan threads to add to it new threads of scan of subdirectories
+     * @param results     List of results to save result on it
      */
     public ThreadFileScan(Path path, Set<Path> ignorePaths, Queue<Runnable> queue, Set<String> results) {
         this.path = path;
@@ -40,7 +41,6 @@ public class ThreadFileScan implements Runnable {
     }
 
     /**
-     *
      * @param curRootPath
      */
     private void oneDirScan(Path curRootPath) {
@@ -51,8 +51,8 @@ public class ThreadFileScan implements Runnable {
             for (Path curPath : stream) {
                 //если это директория - ставим в очередь на сканирование ее содержимого
                 if (Files.isDirectory(curPath)) {
-                    if(!queue.add(new ThreadFileScan(curPath, ignorePaths, queue, results))){
-                    throw new IllegalStateException("Cant add path to scan queue");
+                    if (!queue.add(new ThreadFileScan(curPath, ignorePaths, queue, results))) {
+                        throw new IllegalStateException("Cant add path to scan queue");
                     }
                 }
                 //если это не директория - закидываем в лист результатов
@@ -70,6 +70,7 @@ public class ThreadFileScan implements Runnable {
 
     /**
      * Format file name, date of last modify and size to String
+     *
      * @param path of file
      * @return formatted String
      */

@@ -19,9 +19,9 @@ public class CommandLineArgParser {
     private int numOfThreads = 4;
 
     //никакой логики в конструкторе, просто копируем входные аргументы
-
     /**
      * Construct command line args parser
+     *
      * @param argv command line arguments
      */
     public CommandLineArgParser(String[] argv) {
@@ -51,6 +51,7 @@ public class CommandLineArgParser {
 
     /**
      * parse command line args to internal Collections
+     *
      * @throws IllegalArgumentException if illegal key using
      */
     public void parse() throws IllegalArgumentException {
@@ -66,7 +67,7 @@ public class CommandLineArgParser {
                     throw new IllegalArgumentException("must be only one -");
                 }
             }
-            //ну и раскидываем сначала в пути потом в игнор
+            //ну и раскидываем сначала в пути, потом в игнор
             if (beforeIgnore) {
                 paths.add(new File(arg).toPath());
             } else {
