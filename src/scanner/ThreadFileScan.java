@@ -78,9 +78,9 @@ public class ThreadFileScan implements Runnable {
         File file = path.toFile();
         StringBuilder result = new StringBuilder();
         SimpleDateFormat formater = new SimpleDateFormat("yyyy-MM-dd");
-        result.append("[\n" + "file = ").append(file.getAbsolutePath())
-                .append("\n" + "date = ").append(formater.format(file.lastModified()))
-                .append("\n" + "size = ").append(file.length())
+        result.append("[\nfile = ").append(file.getAbsolutePath())
+                .append("\ndate = ").append(formater.format(file.lastModified()))
+                .append("\nsize = ").append(file.length())
                 .append("]");
         return result.toString();
     }

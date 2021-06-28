@@ -9,6 +9,7 @@ public class main {
         parser.parse();
         FileScanner scanner = new FileScanner(parser.getPaths(), parser.getIgnorePaths());
         scanner.scan(parser.getNumOfThreads());
-        System.out.println("save result of scan to file " + Optional.ofNullable(scanner.saveToFile()).orElseThrow());
+        System.out.println("Scanned " + scanner.getNumOfScannedFiles() + " files");
+        System.out.println("Save result of scan to file " + Optional.ofNullable(scanner.saveToFile()).orElseThrow());
     }
 }

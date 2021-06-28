@@ -52,12 +52,18 @@ public class FileScanner {
         executor.shutdown();
         try {
             //дожидаемся окончания всех потоков
-            executor.awaitTermination(100, TimeUnit.MILLISECONDS);
+            while (!executor.awaitTermination(100, TimeUnit.MILLISECONDS)){
+
+            }
         } catch (InterruptedException e) {
             System.out.println("WTF");
             e.printStackTrace();
         }
         return toString();
+    }
+
+    public Integer getNumOfScannedFiles(){
+        return results.size();
     }
 
     /**

@@ -24,13 +24,17 @@ class FileScannerTest {
         ignorePaths = new HashSet<>();
         ignorePaths.add(new File("/usr/share").toPath());
         ignorePaths.add(new File("/usr/libexec").toPath());
+        ignorePaths.add(new File("/usr/lib").toPath());
         ignorePaths.add(new File("/usr/bin").toPath());
         ignorePaths.add(new File("/usr/include").toPath());
-        FileScanner scanner = new FileScanner(paths, ignorePaths);
-        scanner.scan(1);
-        String scan1 = scanner.toString();
-        scanner.scan(4);
-        String scan2 = scanner.toString();
+        FileScanner scanner1 = new FileScanner(paths, ignorePaths);
+        FileScanner scanner2 = new FileScanner(paths, ignorePaths);
+        scanner1.scan(1);
+        String scan1 = scanner1.toString();
+        //System.out.println(scanner1.getNumOfScannedFiles());
+        scanner2.scan(4);
+        String scan2 = scanner2.toString();
+        //System.out.println(scanner2.getNumOfScannedFiles());
         Assertions.assertEquals(scan1, scan2);
     }
 
@@ -79,7 +83,9 @@ class FileScannerTest {
         }
         executor.shutdown();
         try {
-            executor.awaitTermination(100, TimeUnit.MILLISECONDS);
+            while(!executor.awaitTermination(100, TimeUnit.MILLISECONDS)){
+
+            }
         } catch (InterruptedException e) {
             System.out.println("WTF");
             e.printStackTrace();
